@@ -12,6 +12,7 @@ class GeminiProvider(LLMProvider):
     def __init__(self):
         genai.configure(api_key=settings.GEMINI_API_KEY)
         self.model = genai.GenerativeModel('gemini-2.0-flash')
+        self.embedding_model = "models/gemini-embedding-001"
         
     async def generate(
         self,
@@ -97,7 +98,7 @@ class GeminiProvider(LLMProvider):
             result = await loop.run_in_executor(
                 None,
                 lambda: genai.embed_content(
-                    model="models/embedding-001",
+                    model=self.embedding_model,
                     content=text,
                     task_type="retrieval_document"
                 )

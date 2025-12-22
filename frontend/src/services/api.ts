@@ -115,6 +115,11 @@ export const superAdminAPI = {
     });
     return response.data;
   },
+
+  getDebugUser: async (): Promise<{ user_id: string }> => {
+    const response = await api.get('/super-admin/debug/user');
+    return response.data;
+  },
 };
 
 export default api;

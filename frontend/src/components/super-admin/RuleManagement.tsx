@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { superAdminAPI } from '../../services/api';
 import type { Rule, CreateRuleRequest, DuplicateCheckResponse } from '../../types';
 
-const MOCK_SUPER_ADMIN_ID = 'super-admin-user-id';
+
 
 export function RuleManagement() {
   const [rules, setRules] = useState<Rule[]>([]);
@@ -16,10 +16,21 @@ export function RuleManagement() {
   const [duplicateCheck, setDuplicateCheck] = useState<DuplicateCheckResponse | null>(null);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [extracting, setExtracting] = useState(false);
+  const [userId, setUserId] = useState<string>('');
 
   useEffect(() => {
     loadRules();
+    loadUser();
   }, []);
+
+  const loadUser = async () => {
+    try {
+      const data = await superAdminAPI.getDebugUser();
+      setUserId(data.user_id);
+    } catch (error) {
+      console.error('Failed to load debug user:', error);
+    }
+  };
 
   const loadRules = async () => {
     try {
@@ -51,7 +62,7 @@ export function RuleManagement() {
     }
 
     try {
-      await superAdminAPI.createRule(formData, MOCK_SUPER_ADMIN_ID);
+      await superAdminAPI.createRule(formData, userId);
       alert('Rule created successfully');
       setFormData({ rule_text: '', category: 'IRDAI', severity: 'MEDIUM' });
       setDuplicateCheck(null);
@@ -67,7 +78,7 @@ export function RuleManagement() {
 
     setExtracting(true);
     try {
-      const result = await superAdminAPI.extractRulesFromPDF(MOCK_SUPER_ADMIN_ID, pdfFile);
+      const result = await superAdminAPI.extractRulesFromPDF(userId, pdfFile);
       alert(result.message);
       setPdfFile(null);
       loadRules();
@@ -81,9 +92,9 @@ export function RuleManagement() {
   const toggleRuleStatus = async (ruleId: string, isActive: boolean) => {
     try {
       if (isActive) {
-        await superAdminAPI.deactivateRule(ruleId, MOCK_SUPER_ADMIN_ID);
+        await superAdminAPI.deactivateRule(ruleId, userId);
       } else {
-        await superAdminAPI.activateRule(ruleId, MOCK_SUPER_ADMIN_ID);
+        await superAdminAPI.activateRule(ruleId, userId);
       }
       loadRules();
     } catch (error: any) {
@@ -94,7 +105,12 @@ export function RuleManagement() {
   return (
     <div>
       <div className="card">
-        <h2>Rule Management</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2>Rule Management</h2>
+          <span style={{ fontSize: '12px', color: '#666' }}>
+            User ID: {userId ? userId.substring(0, 8) + '...' : 'Loading...'}
+          </span>
+        </div>
 
         <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
           <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>

@@ -16,6 +16,7 @@ from app.providers.groq_provider import GroqProvider
 from app.providers.pinecone_provider import PineconeProvider
 from app.core.config import settings
 from typing import List
+from app.models.user import User, UserRole
 from uuid import UUID
 
 router = APIRouter(prefix="/super-admin", tags=["Super Admin"])
@@ -181,5 +182,26 @@ async def check_duplicate(
             is_duplicate=result["is_duplicate"],
             matches=matches
         )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/debug/user")
+async def get_debug_user(db: Session = Depends(get_db)):
+    """Get the first super admin user for testing"""
+    user = db.query(User).filter(User.role == UserRole.SUPER_ADMIN).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="No super admin found")
+    return {"user_id": str(user.user_id)}
+
+
+@router.get("/debug/test-embedding")
+async def test_embedding():
+    """Test embedding generation"""
+    try:
+        from app.providers.gemini_provider import GeminiProvider
+        provider = GeminiProvider()
+        vec = await provider.create_embedding("Test embedding for compliance POC")
+        return {"dim": len(vec), "sample": vec[:5]}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
