@@ -3,6 +3,8 @@ from app.providers.vector_provider import VectorProvider
 from app.core.config import settings
 from typing import List, Dict, Optional
 import asyncio
+import traceback
+import math
 
 
 class PineconeProvider(VectorProvider):
@@ -47,7 +49,11 @@ class PineconeProvider(VectorProvider):
                 )
             )
         except Exception as e:
+            print(f"❌ Pinecone upsert failed: {str(e)}")
+            traceback.print_exc()
             raise Exception(f"Pinecone upsert failed: {str(e)}")
+        
+        print(f"✅ Successfully upserted {len(vectors)} vectors to Pinecone (namespace: {namespace})")
     
     async def query(
         self,

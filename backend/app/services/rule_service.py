@@ -8,6 +8,7 @@ from uuid import UUID
 from typing import List, Optional
 import PyPDF2
 import io
+import traceback
 
 
 class RuleService:
@@ -234,7 +235,8 @@ Respond with JSON array:
                 namespace="rules"
             )
         except Exception as e:
-            print(f"Failed to store embedding for rule {rule.rule_id}: {str(e)}")
+            print(f"❌ Failed to store embedding for rule {rule.rule_id}: {str(e)}")
+            traceback.print_exc()
     
     @staticmethod
     def _extract_pdf_text(pdf_content: bytes) -> str:
