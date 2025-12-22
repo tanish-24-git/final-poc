@@ -11,7 +11,10 @@ export function ChatInterface() {
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'system'; content: string; data?: GenerateContentResponse }>>([]);
 
   const handleGenerate = async () => {
-    if (!prompt.trim()) return;
+    if (!prompt.trim() || prompt.length < 5) {
+      setMessages(prev => [...prev, { role: 'system', content: 'Error: Prompt must be at least 5 characters long.' }]);
+      return;
+    }
 
     setLoading(true);
     
@@ -40,13 +43,15 @@ export function ChatInterface() {
       let errorMessage = 'An error occurred';
       
       if (error.response?.data?.detail) {
-        // FastAPI validation errors are arrays of objects
-        if (Array.isArray(error.response.data.detail)) {
-          errorMessage = error.response.data.detail
-            .map((err: any) => `${err.loc.join('.')}: ${err.msg}`)
+        const detail = error.response.data.detail;
+        if (Array.isArray(detail)) {
+          // FastAPI validation errors
+          errorMessage = detail
+            .map((err: any) => `${err.loc[err.loc.length - 1]}: ${err.msg}`)
             .join(', ');
         } else {
-          errorMessage = error.response.data.detail;
+          // Generic HTTP errors
+          errorMessage = String(detail);
         }
       } else if (error.message) {
         errorMessage = error.message;
