@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { agentAPI } from '../../services/api';
 import type { DocumentCheckResponse, ViolationDetail } from '../../types';
 
-const MOCK_USER_ID = 'agent-user-id';
+const MOCK_USER_ID = '00000000-0000-0000-0000-000000000001'; // Valid AGENT UUID
 
 export function DocumentUpload() {
   const [file, setFile] = useState<File | null>(null);
