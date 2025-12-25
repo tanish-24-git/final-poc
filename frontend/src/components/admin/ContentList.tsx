@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
 import type { ContentSubmission } from '../../types';
 
-const MOCK_ADMIN_ID = 'admin-user-id';
+const MOCK_ADMIN_ID = '00000000-0000-0000-0000-000000000002';
 
 export function ContentList() {
   const [submissions, setSubmissions] = useState<ContentSubmission[]>([]);
@@ -20,7 +20,7 @@ export function ContentList() {
       const data = await adminAPI.listContent();
       setSubmissions(data);
     } catch (error: any) {
-      alert(`Error: ${error.response?.data?.detail || error.message}`);
+      alert(`Error: ${JSON.stringify(error.response?.data?.detail || error.message)}`);
     } finally {
       setLoading(false);
     }
@@ -33,7 +33,7 @@ export function ContentList() {
       const data = await adminAPI.getContentDetail(id);
       setDetail(data);
     } catch (error: any) {
-      alert(`Error: ${error.response?.data?.detail || error.message}`);
+      alert(`Error: ${JSON.stringify(error.response?.data?.detail || error.message)}`);
     } finally {
       setDetailLoading(false);
     }
@@ -52,7 +52,7 @@ export function ContentList() {
       setSelectedId(null);
       setDetail(null);
     } catch (error: any) {
-      alert(`Error: ${error.response?.data?.detail || error.message}`);
+      alert(`Error: ${JSON.stringify(error.response?.data?.detail || error.message)}`);
     }
   };
 
@@ -69,7 +69,7 @@ export function ContentList() {
       setSelectedId(null);
       setDetail(null);
     } catch (error: any) {
-      alert(`Error: ${error.response?.data?.detail || error.message}`);
+      alert(`Error: ${JSON.stringify(error.response?.data?.detail || error.message)}`);
     }
   };
 
