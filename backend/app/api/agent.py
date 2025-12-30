@@ -67,7 +67,7 @@ async def generate_content(
         # Format response
         rules_triggered = [
             RuleTriggered(
-                rule_id=UUID(r["rule_id"]) if r["rule_id"] != "ai_detected" else UUID("00000000-0000-0000-0000-000000000000"),
+                rule_id=str(r["rule_id"]),
                 rule_text=r["rule_text"],
                 category=r["category"],
                 severity=r["severity"],

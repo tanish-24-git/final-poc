@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
 import type { ContentSubmission } from '../../types';
+import { FormattedContent } from '../common/FormattedContent';
 
 const MOCK_ADMIN_ID = '00000000-0000-0000-0000-000000000002';
 
@@ -74,123 +75,131 @@ export function ContentList() {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="loading-state">Loading submissions...</div>;
   }
 
   return (
-    <div className="card">
-      <h2>Content Submissions</h2>
+    <div className="admin-container">
+      <div className="admin-header">
+        <h2>Content Submissions</h2>
+        <p>Review and approve generated insurance content.</p>
+      </div>
 
-      {submissions.length === 0 ? (
-        <p style={{ color: 'var(--text-secondary)' }}>No content submissions yet</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Approval</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {submissions.map((sub) => (
-              <tr key={sub.submission_id}>
-                <td>{sub.input_type}</td>
-                <td>
-                  <span className={`status-${sub.compliance_status}`}>
-                    {sub.compliance_status}
-                  </span>
-                </td>
-                <td>{sub.approval_status || 'Pending'}</td>
-                <td>{new Date(sub.created_at).toLocaleString()}</td>
-                <td>
-                  <button
-                    className="btn"
-                    onClick={() => viewDetail(sub.submission_id)}
-                    style={{ fontSize: '12px', padding: '5px 10px' }}
-                  >
-                    View Details
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      <div className="table-card">
+        {submissions.length === 0 ? (
+          <div className="empty-table">No submissions found.</div>
+        ) : (
+          <div className="table-responsive">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th style={{ width: '15%' }}>Type</th>
+                  <th style={{ width: '15%' }}>Status</th>
+                  <th style={{ width: '15%' }}>Approval</th>
+                  <th style={{ width: '25%' }}>Created At</th>
+                  <th style={{ width: '15%', textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {submissions.map((sub) => (
+                  <tr key={sub.submission_id}>
+                    <td><span className="type-badge">{sub.input_type || 'General'}</span></td>
+                    <td>
+                      <span className={`status-badge-sm ${sub.compliance_status}`}>
+                        {sub.compliance_status || 'Unknown'}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`approval-badge ${sub.approval_status || 'pending'}`}>
+                         {sub.approval_status || 'Pending'}
+                      </span>
+                    </td>
+                    <td>{new Date(sub.created_at).toLocaleString()}</td>
+                    <td style={{ textAlign: 'right' }}>
+                      <button
+                        className="btn-link"
+                        onClick={() => viewDetail(sub.submission_id)}
+                      >
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       {detail && (
-        <div style={{ marginTop: '30px', borderTop: '2px solid var(--border-color)', paddingTop: '20px' }}>
-          <h3>Content Detail</h3>
-          
-          {detailLoading ? (
-            <div>Loading details...</div>
-          ) : (
-            <div>
-              <div className="form-group">
-                <label>Input Reference:</label>
-                <p>{detail.input_reference}</p>
-              </div>
+        <div className="drawer-overlay" onClick={() => { setSelectedId(null); setDetail(null); }}>
+          <div className="drawer-content" onClick={e => e.stopPropagation()}>
+             <div className="drawer-header">
+                <h3>Submission Details</h3>
+                <button className="close-btn" onClick={() => { setSelectedId(null); setDetail(null); }}>×</button>
+             </div>
+             
+             {detailLoading ? (
+               <div className="loading-state">Loading details...</div>
+             ) : (
+               <div className="drawer-body">
+                  <div className="detail-section">
+                    <label>Input Reference</label>
+                    <div className="info-box">{detail.input_reference}</div>
+                  </div>
 
-              <div className="form-group">
-                <label>Final Content:</label>
-                <div style={{ padding: '10px', backgroundColor: 'var(--bg-tertiary)', borderRadius: '4px' }}>
-                  {detail.final_content}
-                </div>
-              </div>
+                  <div className="detail-section">
+                     <label>Compliance Analysis</label>
+                     <div className="compliance-summary">
+                        <div className={`status-banner ${detail.compliance_status}`}>
+                             <strong>Status:</strong> {detail.compliance_status.toUpperCase()}
+                        </div>
+                        
+                        {detail.rules_triggered && detail.rules_triggered.length > 0 ? (
+                          <div className="rules-list">
+                             {detail.rules_triggered.map((rule, idx) => (
+                               <div key={idx} className={`rule-card ${rule.status}`}>
+                                  <div className="rule-header">
+                                     <div style={{ display: 'flex', alignItems: 'center' }}>
+                                         <span className={`badge-category badge-${rule.category.toLowerCase().replace(' ', '_')}`}>
+                                            {rule.category}
+                                         </span>
+                                         <span className="rule-status">[{rule.status.toUpperCase()}]</span>
+                                     </div>
+                                     <span className={`severity-dot ${rule.severity}`}></span>
+                                  </div>
+                                  <div className="rule-text">{rule.rule_text}</div>
+                               </div>
+                             ))}
+                          </div>
+                        ) : (
+                          <div className="no-issues">No compliance issues detected.</div>
+                        )}
+                     </div>
+                  </div>
 
-              <div className="form-group">
-                <label>Compliance Status:</label>
-                <p className={`status-${detail.compliance_status}`}>
-                  {detail.compliance_status.toUpperCase()}
-                </p>
-              </div>
+                  <div className="detail-section">
+                    <label>Final Content</label>
+                    <div className="content-preview">
+                      <FormattedContent content={detail.final_content} />
+                    </div>
+                  </div>
 
-              <div className="form-group">
-                <label>Rules Triggered ({detail.rules_triggered?.length || 0}):</label>
-                {detail.rules_triggered && detail.rules_triggered.length > 0 ? (
-                  <ul style={{ marginLeft: '20px' }}>
-                    {detail.rules_triggered.map((rule, idx) => (
-                      <li key={idx} style={{ marginBottom: '10px' }}>
-                        <span className={`severity-badge severity-${rule.severity.toLowerCase()}`}>
-                          {rule.severity}
-                        </span>{' '}
-                        <span
-                          style={{
-                            color: rule.status === 'violated' ? 'var(--error-color)' : 'var(--text-primary)',
-                            fontWeight: rule.status === 'violated' ? 'bold' : 'normal',
-                          }}
-                        >
-                          [{rule.status.toUpperCase()}]
-                        </span>{' '}
-                        [{rule.category}] {rule.rule_text}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p style={{ color: 'var(--text-secondary)' }}>No rules triggered</p>
-                )}
-              </div>
-
-              {!detail.approval_status && (
-                <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-                  <button className="btn btn-success" onClick={handleApprove}>
-                    Approve Content
-                  </button>
-                  <button className="btn btn-danger" onClick={handleReject}>
-                    Reject Content
-                  </button>
-                </div>
-              )}
-
-              {detail.approval_status && (
-                <div style={{ marginTop: '20px', color: 'var(--text-secondary)' }}>
-                  <strong>Status:</strong> {detail.approval_status}
-                </div>
-              )}
-            </div>
-          )}
+                  <div className="drawer-footer">
+                    {!detail.approval_status ? (
+                       <>
+                         <button className="btn-approve" onClick={handleApprove}>Approve</button>
+                         <button className="btn-reject" onClick={handleReject}>Reject</button>
+                       </>
+                    ) : (
+                       <div className="status-locked">
+                          This content has been <strong>{detail.approval_status}</strong>.
+                       </div>
+                    )}
+                  </div>
+               </div>
+             )}
+          </div>
         </div>
       )}
     </div>

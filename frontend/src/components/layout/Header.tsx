@@ -22,14 +22,14 @@ export function Header() {
       <button className="theme-toggle" onClick={toggleTheme}>
         {theme === 'light' ? (
           <>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="currentColor"/>
             </svg>
-            <span style={{ marginLeft: '6px' }}>Dark Mode</span>
+            <span>Dark Mode</span>
           </>
         ) : (
           <>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2" fill="currentColor"/>
               <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
               <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
@@ -40,7 +40,7 @@ export function Header() {
               <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
               <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
             </svg>
-            <span style={{ marginLeft: '6px' }}>Light Mode</span>
+            <span>Light Mode</span>
           </>
         )}
       </button>

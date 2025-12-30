@@ -103,131 +103,131 @@ export function RuleManagement() {
   };
 
   return (
-    <div>
-      <div className="card">
+    <div className="admin-container">
+      <div className="admin-header">
+        <h2>Rule Management</h2>
+        <p>Manage compliance rules, severity levels, and categories.</p>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2>Rule Management</h2>
-          <span style={{ fontSize: '12px', color: '#666' }}>
-            User ID: {userId ? userId.substring(0, 8) + '...' : 'Loading...'}
-          </span>
+            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                System ID: {userId ? userId.substring(0, 8) + '...' : 'Loading...'}
+            </span>
+             <button className="btn-icon-circle" onClick={() => loadRules()} title="Refresh Rules">
+                ⟳
+             </button>
         </div>
+      </div>
 
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-          <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
-            {showForm ? 'Cancel' : 'Create New Rule'}
-          </button>
-        </div>
-
-        {showForm && (
-          <div style={{ marginBottom: '30px', padding: '20px', border: '1px solid var(--border-color)', borderRadius: '8px' }}>
-            <h3>Create New Rule</h3>
-
-            <div className="form-group">
-              <label>Rule Text</label>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
+         {/* Manual Creation Card */}
+         <div className="table-card" style={{ padding: '24px' }}>
+            <h3 style={{ marginBottom: '16px', fontSize: '16px' }}>Create New Rule</h3>
+            <div className="form-group" style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: 600 }}>Rule Text</label>
               <textarea
-                className="textarea"
+                className="input-field"
+                style={{ border: '1px solid var(--border-color)', borderRadius: '8px', minHeight: '80px', fontSize: '14px' }}
                 value={formData.rule_text}
                 onChange={(e) => setFormData({ ...formData, rule_text: e.target.value })}
-                placeholder="Enter rule text..."
+                placeholder="Enter compliance rule text..."
               />
             </div>
-
-            <div className="form-group">
-              <label>Category</label>
-              <select
-                className="input"
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
-              >
-                <option value="IRDAI">IRDAI</option>
-                <option value="Brand">Brand</option>
-                <option value="SEO">SEO</option>
-              </select>
+            
+            <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+                <div style={{ flex: 1 }}>
+                   <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: 600 }}>Category</label>
+                   <select
+                    className="input-field"
+                    style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '8px' }}
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
+                  >
+                    <option value="IRDAI">IRDAI</option>
+                    <option value="Brand">Brand</option>
+                    <option value="SEO">SEO</option>
+                  </select>
+                </div>
+                <div style={{ flex: 1 }}>
+                   <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: 600 }}>Severity</label>
+                    <select
+                        className="input-field"
+                        style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '8px' }}
+                        value={formData.severity}
+                        onChange={(e) => setFormData({ ...formData, severity: e.target.value as any })}
+                    >
+                        <option value="LOW">LOW</option>
+                        <option value="MEDIUM">MEDIUM</option>
+                        <option value="HIGH">HIGH</option>
+                    </select>
+                </div>
             </div>
 
-            <div className="form-group">
-              <label>Severity</label>
-              <select
-                className="input"
-                value={formData.severity}
-                onChange={(e) => setFormData({ ...formData, severity: e.target.value as any })}
-              >
-                <option value="LOW">LOW</option>
-                <option value="MEDIUM">MEDIUM</option>
-                <option value="HIGH">HIGH</option>
-              </select>
+            <div style={{ display: 'flex', gap: '12px' }}>
+                <button className="btn-link" onClick={checkDuplicate}>Check Duplicates</button>
+                <button 
+                  className="send-btn" 
+                  onClick={handleCreateRule}
+                  disabled={!formData.rule_text.trim()}
+                  style={{ marginLeft: 'auto' }}
+                >
+                   Create Rule
+                </button>
             </div>
-
-            <button className="btn" onClick={checkDuplicate} style={{ marginRight: '10px' }}>
-              Check for Duplicates
-            </button>
-
+            
             {duplicateCheck && (
-              <div style={{ marginTop: '10px', padding: '10px', backgroundColor: duplicateCheck.is_duplicate ? 'rgba(255, 0, 0, 0.1)' : 'rgba(0, 255, 0, 0.1)', borderRadius: '4px' }}>
-                {duplicateCheck.is_duplicate ? (
-                  <div>
-                    <strong style={{ color: 'var(--error-color)' }}>⚠ Duplicate Detected!</strong>
-                    <ul style={{ marginLeft: '20px', marginTop: '10px' }}>
-                      {duplicateCheck.matches.map((match, idx) => (
-                        <li key={idx}>
-                          {match.match_type === 'exact' ? '🔴 Exact Match' : '🟡 Semantic Match'} (
-                          {(match.similarity_score * 100).toFixed(0)}%): {match.rule_text}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : (
-                  <strong style={{ color: 'var(--success-color)' }}>✓ No duplicates found</strong>
-                )}
-              </div>
+               <div className={`info-box ${duplicateCheck.is_duplicate ? 'violations' : 'compliant'}`} style={{ marginTop: '16px' }}>
+                 {duplicateCheck.is_duplicate ? (
+                    <div>
+                        <strong>⚠ Duplicate Detected</strong>
+                        <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
+                           {duplicateCheck.matches.map((m, i) => (
+                               <li key={i}>{m.rule_text} ({Math.round(m.similarity_score * 100)}%)</li>
+                           ))}
+                        </ul>
+                    </div>
+                 ) : (
+                    <div style={{ color: 'var(--success)' }}>✓ Unique Rule</div>
+                 )}
+               </div>
             )}
+         </div>
 
-            <button
-              className="btn btn-primary"
-              onClick={handleCreateRule}
-              style={{ marginTop: '10px' }}
-              disabled={!formData.rule_text.trim()}
-            >
-              Create Rule
-            </button>
-          </div>
-        )}
-
-        <div style={{ marginBottom: '30px', padding: '20px', border: '1px solid var(--border-color)', borderRadius: '8px' }}>
-          <h3>Extract Rules from PDF</h3>
-          <div className="form-group">
-            <label>Upload PDF</label>
+         {/* PDF Extraction Card */}
+         <div className="table-card" style={{ padding: '24px' }}>
+            <h3 style={{ marginBottom: '16px', fontSize: '16px' }}>Extract from Document</h3>
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+               Upload a regulatory PDF to automatically extract and create compliance rules.
+            </p>
             <input
               type="file"
               accept=".pdf"
               onChange={(e) => setPdfFile(e.target.files?.[0] || null)}
-              className="input"
+              className="input-field"
+              style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '8px', marginBottom: '16px' }}
             />
-          </div>
-          <button
-            className="btn btn-primary"
-            onClick={handleExtractFromPDF}
-            disabled={!pdfFile || extracting}
-          >
-            {extracting ? 'Extracting...' : 'Extract Rules'}
-          </button>
-        </div>
+            <button
+                className="send-btn"
+                onClick={handleExtractFromPDF}
+                disabled={!pdfFile || extracting}
+                style={{ width: '100%', justifyContent: 'center' }}
+            >
+                {extracting ? 'Processing Document...' : 'Extract Rules'}
+            </button>
+         </div>
       </div>
 
-      <div className="card">
-        <h3>All Rules ({rules.length})</h3>
-        {loading ? (
-          <div>Loading...</div>
-        ) : rules.length === 0 ? (
-          <p style={{ color: 'var(--text-secondary)' }}>No rules created yet</p>
-        ) : (
-          <table>
+      <div className="table-card">
+        <div className="admin-header" style={{ padding: '24px', borderBottom: '1px solid var(--border-color)', marginBottom: 0 }}>
+             <h3 style={{ margin: 0 }}>Active Rules Database</h3>
+             <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Total: {rules.length} Rules</span>
+        </div>
+        
+        <div className="table-responsive">
+          <table className="admin-table">
             <thead>
               <tr>
-                <th>Rule Text</th>
+                <th style={{ width: '50%' }}>Rule Text</th>
                 <th>Category</th>
                 <th>Severity</th>
-                <th>Version</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -235,29 +235,47 @@ export function RuleManagement() {
             <tbody>
               {rules.map((rule) => (
                 <tr key={rule.rule_id}>
-                  <td style={{ maxWidth: '400px' }}>{rule.rule_text}</td>
-                  <td>{rule.category}</td>
                   <td>
-                    <span className={`severity-badge severity-${rule.severity.toLowerCase()}`}>
-                      {rule.severity}
+                    <div style={{ fontSize: '14px', lineHeight: '1.5' }}>{rule.rule_text}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>ID: {rule.rule_id} • v{rule.version}</div>
+                  </td>
+                  <td>
+                    <span className={`badge-category badge-${rule.category.toLowerCase()}`}>
+                        {rule.category}
                     </span>
                   </td>
-                  <td>v{rule.version}</td>
-                  <td>{rule.is_active ? '✓ Active' : '✗ Inactive'}</td>
+                  <td>
+                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span className={`severity-dot ${rule.severity.toLowerCase()}`}></span>
+                        <span style={{ fontSize: '13px', fontWeight: 500 }}>{rule.severity}</span>
+                     </div>
+                  </td>
+                  <td>
+                     <span className={`status-badge-sm ${rule.is_active ? 'compliant' : 'pending'}`}>
+                        {rule.is_active ? 'Active' : 'Inactive'}
+                     </span>
+                  </td>
                   <td>
                     <button
-                      className="btn"
+                      className="btn-link"
                       onClick={() => toggleRuleStatus(rule.rule_id, rule.is_active)}
-                      style={{ fontSize: '12px', padding: '5px 10px' }}
+                      style={{ color: rule.is_active ? 'var(--error)' : 'var(--success)' }}
                     >
                       {rule.is_active ? 'Deactivate' : 'Activate'}
                     </button>
                   </td>
                 </tr>
               ))}
+              {rules.length === 0 && (
+                  <tr>
+                      <td colSpan={5} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                          No rules found. Create one or extract from PDF.
+                      </td>
+                  </tr>
+              )}
             </tbody>
           </table>
-        )}
+        </div>
       </div>
     </div>
   );

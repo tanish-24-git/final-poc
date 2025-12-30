@@ -14,7 +14,7 @@ class ContentGenerateRequest(BaseModel):
 
 class RuleTriggered(BaseModel):
     """Schema for triggered rule info"""
-    rule_id: UUID
+    rule_id: str
     rule_text: str
     category: str
     severity: str

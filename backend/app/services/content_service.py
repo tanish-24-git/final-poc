@@ -159,21 +159,29 @@ Return only the enhanced prompt, nothing else."""
             for r in rules[:10]  # Top 10 most relevant
         ])
         
-        system_prompt = f"""You are a compliance-aware content generator.
+        system_prompt = f"""You are a specialized Insurance Compliance Content Generator for Bajaj Allianz.
 
-STRICT REQUIREMENTS:
+Your goal is to generate high-quality, professional insurance content that NATURALLY complies with all regulations.
+
+CRITICAL INSTRUCTIONS:
+1. You have been provided with a list of COMPLIANCE RULES. You MUST adhere to them.
+2. If a rule requires specific disclaimer text (e.g., "Standard verification text"), you MUST include it VERBATIM at the end of the content.
+3. Do not mention "According to rule X..." or "Here is the compliant content". Just generate the content itself.
+4. Tone: Professional, Empathetic, Clear, Trustworthy (Bajaj Brand Voice).
+5. If the user asks for a specific format (email, letter, etc.), follow it.
+
+ACTIVE COMPLIANCE RULES:
 {rules_text}
 
+REGULATORY CONTEXT:
 {regulatory_context}
 
-Rules to follow:
-1. Never make unverified claims
-2. Always use factual, defensible language
-3. Include appropriate disclaimers
-4. Avoid superlatives without evidence
-5. Respect all regulatory constraints
-
-Generate professional, compliant content."""
+Think step-by-step:
+- Identify which rules apply to this specific topic.
+- Draft the content.
+- Verify: Did I include the mandatory disclaimers?
+- Final Output: The clean, compliant text.
+"""
         
         result = await self.generator_llm.generate(
             prompt=prompt,
@@ -197,20 +205,31 @@ Generate professional, compliant content."""
             "recommendations": ["string"]
         }
         
-        review_prompt = f"""Review this content for compliance issues.
+        review_prompt = f"""Role: You are a precise Compliance Auditor for an insurance company.
+Your job is to check if the content follows the rules.
 
-Content:
+Content to Review:
+\"\"\"
 {content}
+\"\"\"
 
-Rules to check:
+Active Rules:
 {rules_text}
 
-Identify any violations or risks."""
+INSTRUCTIONS:
+1. Compare the content against each rule.
+2. For "Mandatory Disclosures": Check if the essence of the disclosure is present. Acceptable variations are fine.
+3. For "Prohibited Claims": Check if the content makes specific forbidden promises (e.g., "Guaranteed Returns"). **IMPORTANT: If a rule says "Do not include X", and the content DOES NOT include X, then it is COMPLIANT. Do NOT flag it as missing.**
+4. **Logic Check**: If a rule says "Must not use fear", and the tone is neutral, it is COMPLIANT. 
+5. **Channel Checks**: If a rule mandates "official channels only", assume the platform generating this IS an official channel. Do not flag this unless the content explicitly tells users to use unofficial channels (e.g. "WhatsApp me personally").
+6. false positives are UNACCEPTABLE. If you are unsure, err on the side of COMPLIANT.
+
+Analyze carefully. Only report clear, material violations."""
         
         try:
             result = await self.reviewer_llm.generate_structured(
                 prompt=review_prompt,
-                system_prompt="You are a strict compliance reviewer. Flag any potential violations.",
+                system_prompt="You are a helpful and precise compliance assistant.",
                 response_schema=review_schema
             )
             return result
