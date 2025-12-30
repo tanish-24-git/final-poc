@@ -241,7 +241,11 @@ export function ChatInterface() {
         <div className="chat-messages">
           {messages.length === 0 && (
             <div className="empty-state">
-              <div className="empty-state-icon">💬</div>
+              <div className="empty-state-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+                  <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="var(--accent-color)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.5"/>
+                </svg>
+              </div>
               <h3>Welcome to Bajaj Compliance AI</h3>
               <p>Start a conversation to generate compliant insurance content</p>
             </div>
@@ -262,7 +266,17 @@ export function ChatInterface() {
                   {/* Status Badge */}
                   <div style={{ marginBottom: '12px' }}>
                     <span className={`status-badge ${msg.data.compliance_status.toLowerCase()}`}>
-                      {msg.data.compliance_status === 'compliant' ? '✓' : '⚠'}
+                      {msg.data.compliance_status === 'compliant' ? (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+                          <polyline points="20 6 9 17 4 12" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      ) : (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+                          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                          <line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        </svg>
+                      )}
                       {' '}
                       {msg.data.compliance_status.toUpperCase()}
                     </span>
@@ -272,7 +286,13 @@ export function ChatInterface() {
                   {msg.data.rules_triggered.length > 0 && (
                     <div className="violation-card">
                       <div className="violation-header">
-                        <span className="violation-icon">⚠</span>
+                        <span className="violation-icon">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="var(--error-color)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <line x1="12" y1="9" x2="12" y2="13" stroke="var(--error-color)" strokeWidth="2" strokeLinecap="round"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17" stroke="var(--error-color)" strokeWidth="2" strokeLinecap="round"/>
+                          </svg>
+                        </span>
                         <strong style={{ fontSize: '14px' }}>
                           {msg.data.rules_triggered.length} Rule(s) Triggered
                         </strong>

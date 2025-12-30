@@ -111,12 +111,6 @@ code {
   gap: 12px;
 }
 
-.header h1::before {
-  content: '🏢';
-  font-size: 32px;
-  -webkit-text-fill-color: initial;
-}
-
 /* Premium Theme Toggle */
 .theme-toggle {
   background: var(--bg-tertiary);
@@ -141,17 +135,18 @@ code {
   box-shadow: var(--shadow-md);
 }
 
-/* Navigation */
+/* Navigation - Bajaj Blue */
 .nav {
-  background-color: var(--bg-secondary);
+  background: var(--gradient-bajaj);
   padding: 12px 32px;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   gap: 8px;
+  box-shadow: var(--shadow-sm);
 }
 
 .nav a {
-  color: var(--text-primary);
+  color: rgba(255, 255, 255, 0.9);
   text-decoration: none;
   padding: 10px 20px;
   border-radius: 8px;
@@ -161,12 +156,13 @@ code {
 }
 
 .nav a:hover {
-  background-color: var(--hover-bg);
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
   transform: translateY(-1px);
 }
 
 .nav a.active {
-  background: var(--gradient-bajaj);
+  background: rgba(255, 255, 255, 0.25);
   color: white;
   box-shadow: var(--shadow-sm);
 }
